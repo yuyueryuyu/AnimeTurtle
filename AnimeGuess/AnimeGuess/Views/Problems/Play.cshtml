@@ -1,0 +1,99 @@
+﻿@model Problem
+<div>
+    <h4>海龟汤小游戏（线上不含提问ver）</h4>
+    <hr />
+    <h1 id="countdown"></h1>
+    <img id="image" src="/Images/_Normal.jpg" width="680"/>
+    <div id="imagedesc"></div>
+    <dl class="row">
+        <dt class="col-sm-2">
+            描述1
+        </dt>
+        <dd id="desc1" class="col-sm-10">
+            @Html.DisplayFor(model => model.Description1)
+        </dd>
+        <dt class="col-sm-2">
+            描述2
+        </dt>
+        <dd id="desc2" class="col-sm-10">
+        </dd>
+        <dt class="col-sm-2">
+           描述3
+        </dt>
+        <dd id="desc3" class="col-sm-10">
+        </dd>
+    </dl>
+    <div>答案是</div>
+    <div id="ans">@Model.Answer</div>
+</div>
+<div id="checkmsg"></div>
+<input id="inputans" type="text"/>
+<div>
+    <button type="button" class="btn btn-success" onclick="CheckAnswer();">检查答案</button>
+    <button type="button" class="btn btn-success" onclick="ShowAnswer();">直接显示答案</button>
+    <a asp-action="Index">Back to List</a>
+</div>
+<script>
+    // 倒数计时器总时间（以秒为单位）
+    var totalSeconds = 60;
+
+    // 获取显示倒数计时器的元素
+    var countdownElement = document.getElementById("countdown");
+    var desc2elmt = document.getElementById("desc2");
+    var desc3elmt = document.getElementById("desc3");
+    var imageelmt = document.getElementById("image");
+    var imagedescelmt = document.getElementById("imagedesc");
+    var anselmt = document.getElementById("ans");
+    var inputelmt = document.getElementById("inputans");
+    var msg = document.getElementById("checkmsg");
+    var ans = anselmt.innerText;
+    anselmt.innerHTML = "";
+    
+    // 更新倒数计时器函数
+    function updateCountdown() {
+        // 计算剩余时间
+        var minutes = Math.floor(totalSeconds / 60);
+        var seconds = totalSeconds % 60;
+
+        // 格式化时间字符串
+        var timeString = minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0');
+
+        // 更新显示倒数计时器的元素
+        countdownElement.innerHTML = timeString;
+
+        // 减少剩余时间
+        totalSeconds--;
+        if (totalSeconds < 40) {
+            desc2elmt.innerHTML = "@Model.Description2";
+        }
+        if (totalSeconds < 20) {
+            desc3elmt.innerHTML = "@Model.Description3";
+        }
+        if (totalSeconds < 10) {
+            imageelmt.src = "/Images/@Model.ShadowImage";
+        }
+
+        // 如果剩余时间小于等于 0，则停止计时器
+        if (totalSeconds < 0) {
+            imageelmt.src = "/Images/@Model.Image";
+            imagedescelmt.innerHTML = "@Model.ImageDescription";
+            anselmt.innerHTML = "@Model.Answer";
+            clearInterval(countdownTimer);
+            countdownElement.innerHTML = "时间到！";
+        }
+    }
+    function ShowAnswer(){
+        totalSeconds = 0;
+    }
+    function CheckAnswer() {
+        if (inputelmt.value === ans) {
+            msg.innerHTML = "正确！";
+            totalSeconds = 0;
+        }
+        else {
+            msg.innerHTML = inputelmt.value;
+        }
+    }
+    // 启动倒数计时器
+    var countdownTimer = setInterval(updateCountdown, 1000);
+</script>
